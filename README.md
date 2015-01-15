@@ -16,12 +16,6 @@ The scala isn't pretty but the Akka works.
   new technology to me and it seems like the best documented usage.
 - choice of algorithm: the last constraint is interpreted to mean the algorithm
 must be some variation of trial division
-- optimizations of serial trial division:
-  - if all primes of n-1 are known, n need only be tested for division by those
-    primes. 
-  - if one divisor of a number is known, it does not need to continue checking
-    for additional divisors.
-  - divisors need only be checked up to sqrt(n)
 - parallelization strategy:
   - `all_primes` can be decomposed into
     `_is_prime` subproblems. The result of `all_primes` is the
@@ -31,6 +25,12 @@ must be some variation of trial division
       tradeoff between concurrency and messaging overhead.
     - parallelization: The number of workers is a tradeoff between
       parallelism and resources. 
+- optimizations of serial trial division:
+  - if all primes of n-1 are known, n need only be tested for division by those
+    primes. 
+  - if one divisor of a number is known, it does not need to continue checking
+    for additional divisors.
+  - divisors need only be checked up to sqrt(n)
 - parallelized optimizations:
   - The first optimization to the serial algorithm uses shared state (`primes`)
     and therefore will not work as is. If workers synchronized their results
