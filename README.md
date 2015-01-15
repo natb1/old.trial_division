@@ -22,29 +22,29 @@ must be some variation of trial division
 def all_primes(n):
     primes = []
     for i in range(2, n+1): 
-        if not _divisor_found(i, primes):
+        if _is_prime(i, primes):
             primes.append(i)
     return primes
 
-def _divisor_found(i, primes):
+def _is_prime(i, primes):
     sqrti = sqrt(i)
     for prime in primes:
         if prime > sqrti:
             break
         elif i % prime == 0:
-            return True
-    return False
+            return False
+    return True
 ```
 
 ## parallelization strategy:
 - decomposition of `all_primes`: `all_primes` can be decomposed into
-  `_divisor_found` subproblems. The result of `all_primes` is the
-  concatenation of all `_divisor_found` subproblems.
+  `_is_prime` subproblems. The result of `all_primes` is the
+  concatenation of all `_is_prime` subproblems.
   However, the first optimization to the serial algorithm uses shared
   state (`primes`) and therefore will not work as is. If parralelization <
   partitions then some synchronization
   will be required anyway and so the optimization can be used in part. The 
-  `_divisor_found` algorithm will just have to be aware that its view of `primes`
+  `_is_prime` algorithm will just have to be aware that its view of `primes`
   might be stale.
 - choice of parameters:
   - partitions of `all_primes`: The choice of the number of subproblems is a
@@ -53,14 +53,14 @@ def _divisor_found(i, primes):
     how to distribute workers. The number of workers is a tradeoff between
     parallelism and overhead. 
 - optimizations:
-    - `_divisor_found` can be decomposed into
-      trial division subproblems. The result of `_divisor_found` is the "and" of
+    - `_is_prime` can be decomposed into
+      trial division subproblems. The result of `_is_prime` is the "and" of
       all trial division subproblems. However, the second optimization of the
       serial algorithm uses a shared conditional. Benchmarking may show this is
       preferable to partitioning `all_primes`, or they could both be partitioned
       if more concurrency was needed.
     - The time to complete
-      `_divisor_found` subproblems is a function of `i`. If using the "early bailout"
+      `_is_prime` subproblems is a function of `i`. If using the "early bailout"
       optimization the time to complete trial division subproblems is also a
       function of `i` (primes aren't evenly distributed). A potential optimization 
       would be to makes partitions of different sizes. 
