@@ -36,7 +36,7 @@ def _divisor_found(i, primes):
     return False
 ```
 
-## parallelization strategies: (TODO: probably cut this back)
+## parallelization strategy:
 - decomposition of `all_primes`: `all_primes` can be decomposed into
   `_divisor_found` subproblems. The result of `all_primes` is the
   concatenation of all `_divisor_found` subproblems.
@@ -46,24 +46,23 @@ def _divisor_found(i, primes):
   will be required anyway and so the optimization can be used in part. The 
   `_divisor_found` algorithm will just have to be aware that its view of `primes`
   might be stale.
-- decomposition of `_divisor_found`: `divisor_found` can be decomposed into
-  trial division subproblems. The result of `_divisor_found` is the "and" of
-  all trial division subproblems. However, the second optimization of the
-  serial algorithm uses a shared conditional. If parralelization < partitions
-  then some synchronization will be required anyway and so the optimization
-  can be used in part.
 - choice of parameters:
-  - partitions of `all_primes` and `_divisor_found`: The choice of the number of subproblems is a
+  - partitions of `all_primes`: The choice of the number of subproblems is a
     tradeoff between concurrency and overhead. 
-  - parallelization: `all_primes` and `_divisor_found` will share workers. If
-    either were blocking, or if either had priority over the other I would
-    assign each its own queue. The number of workers is a tradeoff between
+  - parallelization: there is only one queue so we don't have to worry about
+    how to distribute workers. The number of workers is a tradeoff between
     parallelism and overhead. 
 - optimizations:
+    - `_divisor_found` can be decomposed into
+      trial division subproblems. The result of `_divisor_found` is the "and" of
+      all trial division subproblems. However, the second optimization of the
+      serial algorithm uses a shared conditional. Benchmarking may show this is
+      preferable to partitioning `all_primes`, or they could both be partitioned
+      if more concurrency was needed.
     - The time to complete
-    `_divisor_found` subproblems is a function of `i`. If using the "early bailout"
-    optimization the time to complete trial division subproblems is also a
-    function of `i` (primes aren't evenly distributed). A potential optimization 
-    would be to makes partitions of different sizes. 
+      `_divisor_found` subproblems is a function of `i`. If using the "early bailout"
+      optimization the time to complete trial division subproblems is also a
+      function of `i` (primes aren't evenly distributed). A potential optimization 
+      would be to makes partitions of different sizes. 
     - additonal optimizations might be required if it were specified that the
-    system had to process concurrent N's.
+      system had to process concurrent N's.
