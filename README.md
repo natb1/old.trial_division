@@ -15,7 +15,8 @@ The scala isn't pretty but the Akka works.
 - choice of technology: I am using Akka with an Actor model because this is a
   new technology to me and it seems like the best documented usage.
 - choice of algorithm: the last constraint is interpreted to mean the algorithm
-must be some variation of trial division
+must be some variation of trial division. Serial implementation of the algorithm
+can be found in serial.py
 - parallelization strategy:
   - `all_primes` can be decomposed into
     `_is_prime` subproblems. The result of `all_primes` is the
@@ -34,6 +35,6 @@ must be some variation of trial division
 - parallelized optimizations:
   - The first optimization to the serial algorithm uses shared state (`primes`)
     and therefore will not work as is. If workers synchronized their results
-    with the Dealer (or an accumulator) then the optimization could still be
+    with the Dealer then the optimization could still be
     used in part. There would just be a tradeoff between the "consistency" and
     "availability" of `primes`.
